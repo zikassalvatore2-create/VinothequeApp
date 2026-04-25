@@ -17,6 +17,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@capacitor/core/dist/capacitor.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@capacitor/filesystem/dist/plugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@capacitor/share/dist/plugin.min.js"></script>
     <style>
         :root {
             --bg: #0d0505;
@@ -1190,12 +1193,42 @@
                                     .Reference)) { this.wines.push(wine);
                                 imported++; } } });
                         resolve(imported); }, error: () => resolve(0) }); }); },
-            async exportBackup() { if (!this.isAdmin()) return;
-                toast('Creating backup...'); const zip = new JSZip();
+            async exportBackup() { 
+                if (!this.isAdmin()) return;
+                toast('Creating backup...'); 
+                const zip = new JSZip();
                 zip.file('wines.json', JSON.stringify(this.wines));
-                zip.file('users.json', JSON.stringify(this.users)); const blob = await zip.generateAsync({ type: 'blob' });
-                saveAs(blob, `vinotheque_backup_${new Date().toISOString().split('T')[0]}.zip`);
-                toast('Backup downloaded! 💾'); },
+                zip.file('users.json', JSON.stringify(this.users)); 
+                const blob = await zip.generateAsync({ type: 'blob' });
+                const fileName = `vinotheque_backup_${new Date().toISOString().split('T')[0]}.zip`;
+
+                if (window.Capacitor && window.capacitorFilesystem && window.capacitorShare) {
+                    try {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(blob);
+                        reader.onloadend = async () => {
+                            const base64data = reader.result.split(',')[1];
+                            const writeResult = await capacitorFilesystem.Filesystem.writeFile({
+                                path: fileName,
+                                data: base64data,
+                                directory: 'CACHE'
+                            });
+                            await capacitorShare.Share.share({
+                                title: 'Vinothèque Backup',
+                                url: writeResult.uri,
+                                dialogTitle: 'Save Backup File'
+                            });
+                            toast('Backup ready to save! 💾');
+                        };
+                    } catch (e) {
+                        toast('Error creating native backup');
+                        console.error(e);
+                    }
+                } else {
+                    saveAs(blob, fileName);
+                    toast('Backup downloaded! 💾'); 
+                }
+            },
             async restoreBackup(input) { const file = input.files[0]; if (!file)
             return;
                 toast('Restoring backup...'); try { if (file.name.endsWith('.zip')) { const zip = await JSZip

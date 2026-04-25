@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Vinotheque Pro</string>
+    <string name="title_activity_main">Vinotheque Pro</string>
+    <string name="package_name">com.zakariae.vinotheque</string>
+    <string name="custom_url_scheme">com.zakariae.vinotheque</string>
+</resources>

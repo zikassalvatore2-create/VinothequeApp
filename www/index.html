@@ -1348,17 +1348,28 @@
                         reader.readAsDataURL(blob);
                         reader.onloadend = async () => {
                             const base64data = reader.result.split(',')[1];
-                            const writeResult = await capacitorFilesystem.Filesystem.writeFile({
-                                path: fileName,
-                                data: base64data,
-                                directory: 'CACHE'
-                            });
-                            await capacitorShare.Share.share({
-                                title: 'Vinothèque Backup',
-                                url: writeResult.uri,
-                                dialogTitle: 'Save Backup File'
-                            });
-                            toast('Backup ready to save! 💾');
+                            try {
+                                // Try saving directly to Downloads folder
+                                await capacitorFilesystem.Filesystem.writeFile({
+                                    path: 'Download/' + fileName,
+                                    data: base64data,
+                                    directory: 'EXTERNAL_STORAGE'
+                                });
+                                toast('Backup saved directly to your Downloads folder! ✅');
+                            } catch (e) {
+                                // Fallback to Cache and Share Menu if permission blocked
+                                const writeResult = await capacitorFilesystem.Filesystem.writeFile({
+                                    path: fileName,
+                                    data: base64data,
+                                    directory: 'CACHE'
+                                });
+                                await capacitorShare.Share.share({
+                                    title: 'Vinothèque Backup',
+                                    url: writeResult.uri,
+                                    dialogTitle: 'Save Backup File'
+                                });
+                                toast('Backup ready to save! 💾');
+                            }
                         };
                     } catch (e) {
                         toast('Error creating native backup');

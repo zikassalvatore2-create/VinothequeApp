@@ -16,6 +16,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js">
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <style>
         :root {
             --bg: #0d0505;
@@ -814,18 +815,18 @@
             DEFAULT_ADMIN: { username: 'admin', password: 'admin123', role: 'admin', created: new Date().toISOString(),
                 favorites: [] },
 
-            init() { this.loadData(); this.updateUI(); this.renderCurrentView(); this.bindEvents(); },
-            loadData() {
-                try { const w = localStorage.getItem(this.STORAGE_KEY);
-                    this.wines = w ? JSON.parse(w).map(w => this.enrich(w)) : []; } catch (e) { this.wines = []; }
-                try { const u = localStorage.getItem(this.USERS_KEY);
-                    this.users = u ? JSON.parse(u) : {}; } catch (e) { this.users = {}; }
+            async init() { await this.loadData(); this.updateUI(); this.renderCurrentView(); this.bindEvents(); },
+            async loadData() {
+                try { const w = await localforage.getItem(this.STORAGE_KEY);
+                    this.wines = w ? w.map(w => this.enrich(w)) : []; } catch (e) { this.wines = []; }
+                try { const u = await localforage.getItem(this.USERS_KEY);
+                    this.users = u ? u : {}; } catch (e) { this.users = {}; }
                 if (!this.users.admin) this.users.admin = { ...this.DEFAULT_ADMIN };
                 if (!this.wines.length) this.loadSampleWines();
                 this.save();
             },
-            save() { try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.wines)); } catch (e) {}
-                localStorage.setItem(this.USERS_KEY, JSON.stringify(this.users)); },
+            save() { try { localforage.setItem(this.STORAGE_KEY, this.wines); } catch (e) {}
+                localforage.setItem(this.USERS_KEY, this.users); },
             enrich(w) {
                 return {
                     Name: w.Name || 'Unknown Wine',

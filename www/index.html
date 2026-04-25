@@ -733,7 +733,7 @@
             <button class="btn btn-outline btn-sm" onclick="loadSampleWines()">🧪 Samples</button>
             <button class="btn btn-outline btn-sm admin-only hidden" onclick="exportBackup()">💾 Backup</button>
             <button class="btn btn-outline btn-sm admin-only hidden" onclick="document.getElementById('restoreInput').click()">📥 Restore</button>
-            <input type="file" id="restoreInput" accept=".zip,.json" hidden onchange="restoreBackup(this)">
+            <input type="file" id="restoreInput" hidden onchange="restoreBackup(this)">
             <button class="btn btn-outline btn-sm admin-only hidden" onclick="fetchAllMissingPhotos()">📸 Auto-Photos</button>
         </div>
 

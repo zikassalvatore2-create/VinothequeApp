@@ -45,7 +45,7 @@
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 70px;
+            padding-bottom: 100px; background-attachment: fixed;
         }
         .app {
             max-width: 900px;
@@ -135,37 +135,7 @@
             font-size: 0.7rem;
         }
 
-        .nav-tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 16px;
-            overflow-x: auto;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 6px;
-        }
-        .nav-tab {
-            padding: 10px 16px;
-            background: none;
-            border: none;
-            color: var(--text3);
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 20px 20px 0 0;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-        .nav-tab:hover {
-            color: var(--text2);
-        }
-        .nav-tab.active {
-            color: var(--gold);
-            background: rgba(212, 165, 78, 0.05);
-            border-bottom: 2px solid var(--gold);
-        }
+        
 
         .toolbar {
             display: flex;
@@ -624,6 +594,94 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Modern Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(26, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-gold);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            padding-bottom: env(safe-area-inset-bottom, 8px);
+            z-index: 100;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+        .nav-tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text3);
+            background: none;
+            border: none;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+        .nav-tab i { font-size: 1.2rem; margin-bottom: 2px; }
+        .nav-tab:hover { color: var(--text2); }
+        .nav-tab.active { color: var(--gold); background: transparent; border: none; transform: translateY(-2px); }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold2), var(--gold), #9a7b3a);
+            color: #1a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            z-index: 90;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .fab:active { transform: scale(0.92); }
+        .fab.hidden { display: none !important; }
+
+        /* Dashboard Styles */
+        .dash-card {
+            background: linear-gradient(145deg, rgba(45,18,18,0.7), rgba(26,10,10,0.9));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .dash-value { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; color: var(--gold); font-weight: 700; }
+        .dash-label { font-size: 0.8rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        /* Tasting Profile Bars */
+        .tasting-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.75rem; color: var(--text2); }
+        .tasting-label { width: 70px; }
+        .tasting-bar-bg { flex: 1; height: 6px; background: var(--bg); border-radius: 3px; position: relative; overflow: hidden; border: 1px solid var(--border); }
+        .tasting-bar-fill { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, #9a7b3a, var(--gold)); border-radius: 3px; }
+
+        /* Glass Modal */
+        .modal {
+            background: rgba(26, 10, 10, 0.85) !important;
+            backdrop-filter: blur(25px) !important;
+            -webkit-backdrop-filter: blur(25px) !important;
+            border: 1px solid rgba(184, 148, 78, 0.3) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255,255,255,0.05) inset !important;
+        }
     </style>
 </head>
 <body>
@@ -639,12 +697,18 @@
             </div>
         </header>
 
+        <!-- Floating Action Button -->
+        <div class="fab admin-only hidden" onclick="addNewWine()">
+            <i class="fas fa-plus"></i>
+        </div>
+
         <!-- Navigation -->
-        <nav class="nav-tabs">
-            <button class="nav-tab active" data-tab="cellar">🍷 Cellar</button>
-            <button class="nav-tab" data-tab="pairings">🍽️ Pairings</button>
-            <button class="nav-tab" data-tab="favorites">❤️ Favorites</button>
-            <button class="nav-tab admin-only hidden" data-tab="admin">👑 Admin</button>
+        <nav class="bottom-nav">
+            <button class="nav-tab active" data-tab="dashboard"><i class="fas fa-chart-pie"></i>Insights</button>
+            <button class="nav-tab" data-tab="cellar"><i class="fas fa-wine-bottle"></i>Cellar</button>
+            <button class="nav-tab" data-tab="pairings"><i class="fas fa-utensils"></i>Pairings</button>
+            <button class="nav-tab" data-tab="favorites"><i class="fas fa-heart"></i>Favorites</button>
+            <button class="nav-tab admin-only hidden" data-tab="admin"><i class="fas fa-cog"></i>Settings</button>
         </nav>
 
         <!-- Search Bar -->
@@ -674,7 +738,27 @@
         </div>
 
         <!-- Views -->
-        <div id="cellarView"><div class="wine-grid" id="wineGrid"></div></div>
+                <div id="dashboardView">
+            <div class="dash-card">
+                <div class="dash-label">Estimated Cellar Value</div>
+                <div class="dash-value" id="dashValue">€0</div>
+            </div>
+            <div class="dash-grid">
+                <div class="dash-card">
+                    <div class="dash-value" id="dashCount">0</div>
+                    <div class="dash-label">Bottles</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-value" id="dashAvg">€0</div>
+                    <div class="dash-label">Avg Price</div>
+                </div>
+            </div>
+            <div class="dash-card" style="text-align:left;">
+                <div class="dash-label" style="margin-bottom:12px;">By Type</div>
+                <div id="dashTypes"></div>
+            </div>
+        </div>
+        <div id="cellarView" class="hidden"><div class="wine-grid" id="wineGrid"></div></div>
         <div id="pairingsView" class="hidden">
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
                 <button class="btn btn-outline btn-sm dish-btn active" data-dish="beef">🥩 Beef</button>
@@ -791,6 +875,15 @@
             <div class="form-group"><label class="form-label">Vintage</label><input class="form-input" id="editVintage"></div>
             <div class="form-group"><label class="form-label">Grape</label><input class="form-input" id="editGrape"></div>
             <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="editType"><option>Red</option><option>White</option><option>Rosé</option><option>Sparkling</option><option>Dessert</option></select></div>
+            <div class="form-group"><label class="form-label">Peak Maturity (e.g., 2025-2035)</label><input class="form-input" id="editMaturity"></div>
+            <div class="form-group"><label class="form-label">Cellar Bin / Location</label><input class="form-input" id="editBin"></div>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="form-group"><label class="form-label">Body (1-5)</label><input class="form-input" type="number" min="1" max="5" id="editBody"></div>
+                <div class="form-group"><label class="form-label">Tannin (1-5)</label><input class="form-input" type="number" min="1" max="5" id="editTannin"></div>
+                <div class="form-group"><label class="form-label">Acidity (1-5)</label><input class="form-input" type="number" min="1" max="5" id="editAcidity"></div>
+                <div class="form-group"><label class="form-label">Sweetness (1-5)</label><input class="form-input" type="number" min="1" max="5" id="editSweetness"></div>
+            </div>
             <div class="form-group"><label class="form-label">Price (€)</label><input class="form-input" id="editPrice" type="number" step="0.01"></div>
             <div class="form-group"><label class="form-label">Rating (1-100)</label><input class="form-input" id="editRating" type="number" min="1" max="100"></div>
             <button class="btn btn-gold" style="width:100%;" onclick="saveWineEdit()">💾 Save Changes</button>
@@ -808,7 +901,7 @@
             favorites: new Set(),
             currentUser: null,
             users: {},
-            currentTab: 'cellar',
+            currentTab: 'dashboard',
             currentDish: 'beef',
             editingRef: null,
             detailRef: null,
@@ -843,7 +936,13 @@
                     Aroma: w.Aroma || '',
                     Price: parseFloat(String(w.Price || 0).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0,
                     Rating: parseInt(w.Rating) || Math.floor(Math.random() * 20 + 80),
-                    Image: w.Image || ''
+                    Image: w.Image || '',
+                    PeakMaturity: w.PeakMaturity || '',
+                    BinLocation: w.BinLocation || '',
+                    Body: parseInt(w.Body) || 3,
+                    Tannin: parseInt(w.Tannin) || 3,
+                    Acidity: parseInt(w.Acidity) || 3,
+                    Sweetness: parseInt(w.Sweetness) || 1
                 };
             },
             detectType(w) {
@@ -951,18 +1050,37 @@
             </div>`;
             },
             renderCurrentView() {
-                ['cellarView', 'pairingsView', 'favoritesView', 'adminView'].forEach(id => document
+                ['dashboardView', 'cellarView', 'pairingsView', 'favoritesView', 'adminView'].forEach(id => document
             .getElementById(id).classList.add('hidden'));
                 const viewId = this.currentTab + 'View';
                 document.getElementById(viewId).classList.remove('hidden');
                 document.getElementById('toolbar').style.display = (this.currentTab === 'cellar' || this
                     .currentTab === 'favorites') ? 'flex' : 'none';
-                if (this.currentTab === 'cellar') this.renderCellar();
+                if (this.currentTab === 'dashboard') this.renderDashboard();
+                else if (this.currentTab === 'cellar') this.renderCellar();
                 else if (this.currentTab === 'pairings') this.renderPairings();
                 else if (this.currentTab === 'favorites') this.renderFavorites();
                 else if (this.currentTab === 'admin' && this.isAdmin()) this.renderAdmin();
                 document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab ===
                     this.currentTab));
+            },
+            
+            renderDashboard() {
+                const count = this.wines.length;
+                const totalVal = this.wines.reduce((sum, w) => sum + w.Price, 0);
+                document.getElementById('dashValue').innerText = '€' + totalVal.toLocaleString();
+                document.getElementById('dashCount').innerText = count;
+                document.getElementById('dashAvg').innerText = count ? '€' + Math.round(totalVal/count) : '€0';
+                
+                const types = {};
+                this.wines.forEach(w => types[w.Type] = (types[w.Type] || 0) + 1);
+                document.getElementById('dashTypes').innerHTML = Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([t, c]) => `
+                    <div class="tasting-row">
+                        <span class="tasting-label" style="width:80px;">${t}</span>
+                        <div class="tasting-bar-bg"><div class="tasting-bar-fill" style="width:${(c/count)*100}%"></div></div>
+                        <span style="width:30px;text-align:right;">${c}</span>
+                    </div>
+                `).join('');
             },
             renderCellar() {
                 const filtered = this.getFiltered();
@@ -1031,6 +1149,16 @@
             <div class="detail-item"><span class="label">Grape</span><span class="value">${this.esc(w.Grape) || '—'}</span></div>
             <div class="detail-item"><span class="label">Region</span><span class="value">${this.esc(w.Region) || '—'}</span></div>
             <div class="detail-item"><span class="label">Vintage</span><span class="value">${w.Vintage}</span></div>
+            ${w.PeakMaturity ? `<div class="detail-item"><span class="label">Peak Maturity</span><span class="value">${this.esc(w.PeakMaturity)}</span></div>` : ''}
+            ${w.BinLocation ? `<div class="detail-item"><span class="label">Cellar Location</span><span class="value"><i class="fas fa-box-open" style="color:var(--gold);font-size:0.8rem;"></i> ${this.esc(w.BinLocation)}</span></div>` : ''}
+            
+            <div class="detail-item" style="grid-column:1/-1; border:none; padding-bottom:0;">
+                <span class="label" style="margin-bottom:8px; display:block;">Tasting Profile</span>
+                <div class="tasting-row"><span class="tasting-label">Body</span><div class="tasting-bar-bg"><div class="tasting-bar-fill" style="width:${(w.Body/5)*100}%"></div></div></div>
+                <div class="tasting-row"><span class="tasting-label">Tannin</span><div class="tasting-bar-bg"><div class="tasting-bar-fill" style="width:${(w.Tannin/5)*100}%"></div></div></div>
+                <div class="tasting-row"><span class="tasting-label">Acidity</span><div class="tasting-bar-bg"><div class="tasting-bar-fill" style="width:${(w.Acidity/5)*100}%"></div></div></div>
+                <div class="tasting-row"><span class="tasting-label">Sweetness</span><div class="tasting-bar-bg"><div class="tasting-bar-fill" style="width:${(w.Sweetness/5)*100}%"></div></div></div>
+            </div>
             <div class="detail-item"><span class="label">Type</span><span class="value">${w.Type} · ${w.Dryness}</span></div>
             <div class="detail-item" style="grid-column:1/-1;"><span class="label">Aroma</span><span class="value">${this.esc(w.Aroma) || 'Complex and elegant'}</span></div>
             <div class="detail-item" style="grid-column:1/-1;"><span class="label">Pairing</span><span class="value">${this.esc(w.Pairing) || 'Versatile'}</span></div>
@@ -1094,6 +1222,12 @@
                 document.getElementById('editType').value = w.Type;
                 document.getElementById('editPrice').value = w.Price;
                 document.getElementById('editRating').value = w.Rating;
+                document.getElementById('editMaturity').value = w.PeakMaturity || '';
+                document.getElementById('editBin').value = w.BinLocation || '';
+                document.getElementById('editBody').value = w.Body || 3;
+                document.getElementById('editTannin').value = w.Tannin || 3;
+                document.getElementById('editAcidity').value = w.Acidity || 3;
+                document.getElementById('editSweetness').value = w.Sweetness || 1;
                 this.editingRef = this.detailRef;
                 document.getElementById('editWineModal').classList.remove('hidden'); },
             saveWineEdit() { if (!this.editingRef) return; const w = this.wines.find(w => w.Reference === this
@@ -1105,6 +1239,12 @@
                 w.Type = document.getElementById('editType').value;
                 w.Price = parseFloat(document.getElementById('editPrice').value) || 0;
                 w.Rating = parseInt(document.getElementById('editRating').value) || 80;
+                w.PeakMaturity = document.getElementById('editMaturity').value;
+                w.BinLocation = document.getElementById('editBin').value;
+                w.Body = parseInt(document.getElementById('editBody').value) || 3;
+                w.Tannin = parseInt(document.getElementById('editTannin').value) || 3;
+                w.Acidity = parseInt(document.getElementById('editAcidity').value) || 3;
+                w.Sweetness = parseInt(document.getElementById('editSweetness').value) || 1;
                 this.save();
                 document.getElementById('editWineModal').classList.add('hidden');
                 this.renderCurrentView();
